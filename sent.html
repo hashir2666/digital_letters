@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <link rel="icon" type="image/png" href="favicon.png">
+
+<meta property="og:title" content="Digital Letters">
+<meta property="og:description" content="A special letter just for you.">
+<meta property="og:image" content="favicon.png">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="favicon.png">
+<title>Letter Sent</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+  margin: 0;
+  font-family: Arial;
+  background-image: url("recipientbg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 50px;
+  text-align: center;
+  box-shadow: 0px 0px 25px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 90%;
+}
+
+.card h1 {
+  font-family: 'Dancing Script', cursive;
+  color: #b5174a;
+  font-size: 40px;
+  margin-bottom: 30px;
+}
+
+.copyBtn {
+  padding: 15px 30px;
+  font-size: 18px;
+  background-color: #b5174a;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.viewBtn {
+  padding: 15px 30px;
+  font-size: 18px;
+  background-color: white;
+  color: #b5174a;
+  border: 2px solid #b5174a;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.linkText {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #888;
+  word-break: break-all;
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div class="card">
+  <h1>Your Letter is Ready 💌</h1>
+  <div>
+    <button class="copyBtn" onclick="copyLink()">Copy Link 🔗</button>
+    <button class="viewBtn" onclick="viewLetter()">View as Recipient →</button>
+  </div>
+  <p class="linkText" id="linkDisplay">Saving your letter...</p>
+</div>
+
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD9kJWUWWVTV4pyr3APRKT9gcAjjh8vQEk",
+    authDomain: "digital-letters-4675c.firebaseapp.com",
+    projectId: "digital-letters-4675c",
+    storageBucket: "digital-letters-4675c.firebasestorage.app",
+    messagingSenderId: "768694635575",
+    appId: "1:768694635575:web:2d6bc5f10eb25c616e43b2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Get letter data from localStorage
+  const letterText = localStorage.getItem("letterText") || "";
+  const envelope = localStorage.getItem("selectedEnvelope") || "1";
+
+  // Generate unique ID
+  const letterId = crypto.randomUUID();
+
+  // Save to Firebase
+  await setDoc(doc(db, "letters", letterId), {
+    text: letterText,
+    envelope: envelope,
+    timesRead: 0,
+    createdAt: new Date()
+  });
+
+  // Generate shareable link
+  const link = `${window.location.origin}/recipient.html?id=${letterId}`;
+  document.getElementById("linkDisplay").textContent = link;
+
+  // Store link for view button
+  window.currentLink = link;
+  window.letterId = letterId;
+
+  window.copyLink = function(){
+    navigator.clipboard.writeText(link);
+    alert("Link copied!");
+  }
+
+  window.viewLetter = function(){
+    window.location.href = `recipient.html?id=${letterId}`;
+  }
+
+</script>
+
+</body>
+</html>

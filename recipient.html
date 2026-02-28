@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <link rel="icon" type="image/png" href="favicon.png">
+
+<meta property="og:title" content="Digital Letters">
+<meta property="og:description" content="A special letter just for you.">
+<meta property="og:image" content="favicon.png">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="favicon.png">
+<title>Your Letter</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+  .writeBtn {
+    position: fixed;       /* stays at bottom-left even if letter scrolls */
+    bottom: 20px;          /* 20px from bottom */
+    left: 20px;            /* 20px from left */
+    padding: 8px 16px;     /* smaller than main button */
+    font-size: 14px;       /* smaller text */
+    border-radius: 15px;
+    border: none;
+    background-color: pink;
+    color: white;
+    cursor: pointer;
+    z-index: 10;           /* on top of letter content */
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.writeBtn:hover {
+    background-color: #ff69b4;  /* hover effect */
+    transform: scale(1.05);
+}
+
+body {
+  margin: 0;
+  font-family: Arial;
+  background-image: url("images/recipientbg.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+#sealScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+  background-image: url("images/recipientbg.png");
+  background-size: cover;
+}
+
+#sealEmoji {
+  font-size: 80px;
+  cursor: pointer;
+  animation: pulse 1.5s infinite;
+}
+
+#sealHint {
+  font-family: 'Dancing Script', cursive;
+  font-size: 22px;
+  color: red;
+  text-shadow: 0px 0px 10px rgba(0,0,0,0.3);
+  animation: pulse 1.5s infinite;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+#letterWrapper {
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 0;
+  width: 100%;
+}
+
+#letterCard {
+  position: relative;
+  width: 500px;
+  min-height: 600px;
+  background-image: url("images/template.png");
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+  box-shadow: 0px 0px 40px rgba(0,0,0,0.25);
+  padding: 60px 55px;
+  box-sizing: border-box;
+  transform: scaleY(0.05) scaleX(0.8);
+  opacity: 0;
+  transform-origin: center center;
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+}
+
+#letterCard.unfolded {
+  transform: scaleY(1) scaleX(1);
+  opacity: 1;
+}
+
+#letterText {
+  font-family: 'Dancing Script', cursive;
+  font-size: 20px;
+  color: #9a7d65;
+  line-height: 38px;
+  white-space: pre-wrap;
+}
+
+.timesRead {
+  position: fixed;
+  bottom: 20px;
+  right: 25px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 18px;
+  color: white;
+  text-shadow: 0px 0px 8px rgba(0,0,0,0.3);
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="sealScreen" onclick="window.openLetter && window.openLetter()">
+  <div id="sealEmoji">💌</div>
+  <div id="sealHint">Tap to open your letter</div>
+</div>
+
+<div id="letterWrapper">
+  <div id="letterCard">
+    <div id="letterText">Loading...</div>
+  </div>
+</div>
+
+<div class="timesRead" id="timesRead">Times Read: 0</div>
+
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD9kJWUWWVTV4pyr3APRKT9gcAjjh8vQEk",
+    authDomain: "digital-letters-4675c.firebaseapp.com",
+    projectId: "digital-letters-4675c",
+    storageBucket: "digital-letters-4675c.firebasestorage.app",
+    messagingSenderId: "768694635575",
+    appId: "1:768694635575:web:2d6bc5f10eb25c616e43b2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Get letter ID from URL
+  const params = new URLSearchParams(window.location.search);
+  const letterId = params.get("id");
+
+  let letterData = null;
+
+  if(letterId){
+    // Fetch letter from Firebase
+    const docRef = doc(db, "letters", letterId);
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+      letterData = docSnap.data();
+      document.getElementById("letterText").innerText = letterData.text;
+      document.getElementById("timesRead").innerText = "Times Read: " + letterData.timesRead;
+
+      // Update times read
+      await updateDoc(docRef, { timesRead: increment(1) });
+    } else {
+      document.getElementById("letterText").innerText = "Letter not found.";
+    }
+  } else {
+    // Fallback to localStorage for testing
+    document.getElementById("letterText").innerText = localStorage.getItem("letterText") || "No letter found.";
+  }
+
+  window.openLetter = function(){
+    document.getElementById("sealScreen").style.opacity = "0";
+    document.getElementById("sealScreen").style.transition = "opacity 0.5s ease";
+
+    setTimeout(function(){
+      document.getElementById("sealScreen").style.display = "none";
+      document.body.style.backgroundImage = "url('images/letters.jpg')";
+      document.getElementById("letterWrapper").style.display = "flex";
+
+      setTimeout(function(){
+        document.getElementById("letterCard").classList.add("unfolded");
+      }, 100);
+    }, 500);
+  }
+
+</script>
+
+<a href="index.html">
+  <button class="writeBtn">Let's Write</button>
+</a>
+
+</body>
+</html>

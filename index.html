@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<meta property="og:image" content="favicon.png">
+<meta property="og:title" content="Digital Letters">
+<meta property="og:description" content="Send a heartfelt digital letter.">
+<title>Digital Letters</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+  .credit {
+    position: fixed;      /* Stays in place while scrolling */
+    bottom: 10px;         /* 10px from bottom */
+    right: 10px;          /* 10px from right */
+    color: white;         /* visible on video background */
+    font-family: 'Dancing Script', cursive;  /* matches your theme */
+    font-size: 14px;      /* small but readable */
+    text-shadow: 0px 0px 5px rgba(0,0,0,0.6); /* slight shadow for visibility */
+    z-index: 10;          /* in front of video */
+    opacity: 0.8;         /* subtle transparency */
+}
+
+#bgVideo{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-1;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial;
+}
+
+h1 {
+  color: white;
+  font-family: 'Dancing Script', cursive;
+  font-size: 50px;
+  text-align: center;
+  text-shadow: 0px 0px 15px rgba(255, 182, 193, 0.8);
+}
+
+.startBtn {
+  margin-top: 20px;
+  padding: 15px 30px;
+  font-size: 20px;
+  border-radius: 25px;
+  border: none;
+  background-color: pink;
+  color: white;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+}
+
+a {
+  text-decoration: none;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+<!-- Video Background -->
+<video autoplay muted loop id="bgVideo">
+  <source src="background.mp4" type="video/mp4">
+</video>
+
+<div class="credit">
+    Visuals by Hashir
+</div>
+
+<div class="message">
+
+  <h1>
+    Let your loved ones know they are not alone
+  </h1>
+
+  <a href="envelopes.html">
+    <button class="startBtn">
+      Write Your Letter
+    </button>
+    
+    
+  </a>
+
+</div>
+
+</body>
+
+</html>
